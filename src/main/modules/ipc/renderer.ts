@@ -312,5 +312,18 @@ const rendererProcessBridge = {
     data?: { status: string; logs: string[]; exit_code: number | null }
     error?: string
   }> => ipcRenderer.invoke('runtime:get-compilation-status', ipAddress, jwtToken),
+
+  // ===================== AGENT MCP =====================
+  onAgentProjectSync: (callback: IpcRendererCallbacks) => ipcRenderer.on('agent:project-sync', callback),
+  onAgentConsoleLog: (callback: IpcRendererCallbacks) => ipcRenderer.on('agent:console-log', callback),
+  onAgentApprovalRequest: (callback: IpcRendererCallbacks) => ipcRenderer.on('agent:approval-request', callback),
+  onAgentLockState: (callback: IpcRendererCallbacks) => ipcRenderer.on('agent:lock-state', callback),
+  onAgentSnapshotRequest: (callback: IpcRendererCallbacks) => ipcRenderer.on('agent:snapshot-request', callback),
+  onAgentRuntimeConnection: (callback: IpcRendererCallbacks) => ipcRenderer.on('agent:runtime-connection', callback),
+  agentApprovalResponse: (requestId: string, approved: boolean) =>
+    ipcRenderer.send('agent:approval-response', { requestId, approved }),
+  agentSnapshotResponse: (requestId: string, snapshot: unknown) =>
+    ipcRenderer.send('agent:snapshot-response', { requestId, snapshot }),
+  agentLockRequest: () => ipcRenderer.send('agent:lock-request'),
 }
 export default rendererProcessBridge

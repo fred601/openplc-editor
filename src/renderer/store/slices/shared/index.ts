@@ -1551,6 +1551,7 @@ export const createSharedSlice: StateCreator<
       if (getState().workspace.editingState !== 'unsaved') {
         getState().workspaceActions.setEditingState('unsaved')
       }
+      window.bridge.agentLockRequest()
     },
   },
   snapshotActions: {

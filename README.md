@@ -42,6 +42,8 @@ npm run start:dev
 
 Please go to the repository [wiki](https://github.com/Autonomy-Logic/openplc-editor/wiki) page to get instruction about the project.
 
+Agent MCP（本机 127.0.0.1、IEC 61131-10 交换、编译与调试）见 [docs/agent-mcp-zh.md](docs/agent-mcp-zh.md)。
+
 ## Project Management
 
 Go to [project](https://github.com/orgs/Autonomy-Logic/projects/4) management page to see the current state of the project.

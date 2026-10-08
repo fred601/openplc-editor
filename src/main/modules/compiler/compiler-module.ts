@@ -355,9 +355,27 @@ class CompilerModule {
 
   // +++++++++++++++++++++++++++ Compilation Methods +++++++++++++++++++++++++++++
 
-  async handleGenerateXMLfromJSON(sourceTargetFolderPath: string, jsonData: ProjectState['data']) {
+  /**
+   * contentHeader@name follows project.json meta.name when the file is readable.
+   * Compilation still receives ProjectState data, which does not include meta.
+   */
+  private async readProjectDisplayName(projectDirectory: string): Promise<string | undefined> {
+    try {
+      const raw = await fs.readFile(join(projectDirectory, 'project.json'), 'utf-8')
+      const parsed = JSON.parse(raw) as { meta?: { name?: string } }
+      return parsed.meta?.name || undefined
+    } catch {
+      return undefined
+    }
+  }
+
+  async handleGenerateXMLfromJSON(
+    sourceTargetFolderPath: string,
+    jsonData: ProjectState['data'],
+    projectName?: string,
+  ) {
     return new Promise<MethodsResult<{ xmlPath: string; xmlContent: string }>>((resolve, reject) => {
-      const { data: xmlData } = XmlGenerator(jsonData, 'old-editor')
+      const { data: xmlData } = XmlGenerator(jsonData, 'old-editor', { projectName })
       if (typeof xmlData !== 'string') {
         reject(new Error('XML data is not a string'))
         return
@@ -1168,7 +1186,8 @@ class CompilerModule {
     // Step 2: Generate XML from JSON
     let generateXMLResult: MethodsResult<{ xmlPath: string; xmlContent: string }> = { success: false }
     try {
-      generateXMLResult = await this.handleGenerateXMLfromJSON(sourceTargetFolderPath, projectData)
+      const projectName = await this.readProjectDisplayName(normalizedProjectPath)
+      generateXMLResult = await this.handleGenerateXMLfromJSON(sourceTargetFolderPath, projectData, projectName)
       _mainProcessPort.postMessage({
         logLevel: 'info',
         message: `Generated XML from JSON at: ${generateXMLResult.data?.xmlPath as string}`,
@@ -1784,7 +1803,12 @@ class CompilerModule {
     }
 
     try {
-      const generateXMLResult = await this.handleGenerateXMLfromJSON(sourceTargetFolderPath, projectData)
+      const projectName = await this.readProjectDisplayName(normalizedProjectPath)
+      const generateXMLResult = await this.handleGenerateXMLfromJSON(
+        sourceTargetFolderPath,
+        projectData,
+        projectName,
+      )
       _mainProcessPort.postMessage({
         logLevel: 'info',
         message: `Generated XML from JSON at: ${generateXMLResult.data?.xmlPath as string}`,

@@ -122,6 +122,12 @@ export const oldEditorParseInterface = (pou: PLCPou) => {
         xml.tempVars.variable.push(v)
         return
       }
+      case 'global': {
+        if (!xml.globalVars) xml.globalVars = { variable: [] }
+        if (!xml.globalVars.variable) xml.globalVars.variable = []
+        xml.globalVars.variable.push(v)
+        return
+      }
       default:
         return
     }

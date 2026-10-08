@@ -1,5 +1,6 @@
-import { ConfirmDeleteModalProps, SaveChangeModalProps } from '@root/renderer/components/_organisms/modals'
+import { AgentApprovalModal, ConfirmDeleteModalProps, SaveChangeModalProps } from '@root/renderer/components/_organisms/modals'
 import { TitleBar } from '@root/renderer/components/_organisms/title-bar'
+import { useAgentMcp } from '@root/renderer/hooks/use-agent-mcp'
 import { useOpenPLCStore } from '@root/renderer/store'
 import { cn } from '@root/utils'
 import { ComponentPropsWithoutRef, ReactNode, useEffect, useState } from 'react'
@@ -12,6 +13,7 @@ import { AcceleratorHandler } from './accelerator-handler'
 type AppLayoutProps = ComponentPropsWithoutRef<'main'>
 const AppLayout = ({ children, ...rest }: AppLayoutProps): ReactNode => {
   const [isLinux, setIsLinux] = useState(true)
+  const agentLock = useAgentMcp()
   const {
     modals,
     workspaceActions: { setSystemConfigs, setRecent },
@@ -46,8 +48,15 @@ const AppLayout = ({ children, ...rest }: AppLayoutProps): ReactNode => {
         )}
         {...rest}
       >
-        {children}
+        {agentLock.readonly && (
+          <div className='pointer-events-none absolute left-0 right-0 top-0 z-40 bg-amber-500 px-3 py-1 text-center text-xs font-medium text-neutral-950'>
+            Agent holds this project ({agentLock.holder ?? 'agent'}). The editor is read-only until the agent saves or
+            releases the lock.
+          </div>
+        )}
+        <div className={cn('flex min-h-0 min-w-0 flex-1', agentLock.readonly && 'pointer-events-none')}>{children}</div>
         <Toaster />
+        <AgentApprovalModal />
         {modals?.['create-project']?.open === true && <ProjectModal isOpen={modals['create-project'].open} />}
         {modals?.['save-changes-project']?.open === true && (
           <SaveChangesModal
