@@ -16,9 +16,15 @@ import {
   oldEditorParsePousToXML,
 } from './xml-generator/old-editor'
 
+type XmlGeneratorOptions = {
+  /** IEC contentHeader@name. The exporter used to hard-code Unnamed. */
+  projectName?: string
+}
+
 const XmlGenerator = (
   projectToGenerateXML: ProjectState['data'],
   xmlFormatTarget: 'old-editor' | 'codesys' = 'old-editor',
+  options?: XmlGeneratorOptions,
 ) => {
   let xmlResult = xmlFormatTarget === 'old-editor' ? getBaseOldEditorXmlStructure() : getBaseCodeSysXmlStructure()
 
@@ -58,6 +64,10 @@ const XmlGenerator = (
      */
     const configuration = projectToGenerateXML.configuration
     xmlResult = codeSysInstanceToXml(xmlResult, configuration)
+  }
+
+  if (options?.projectName) {
+    xmlResult.project.contentHeader['@name'] = options.projectName
   }
 
   const doc = create(xmlResult)

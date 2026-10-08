@@ -14,9 +14,11 @@ import { enableMapSet } from 'immer'
 import { platform, release } from 'os'
 import { join, resolve } from 'path'
 
+import packageJson from '../../package.json'
 // TODO: Refactor this type declaration
 import { MainIpcModuleConstructor } from './contracts/types/modules/ipc/main'
 import MenuBuilder from './menu'
+import { startAgentMcp } from './modules/agent-mcp'
 import { CompilerModule } from './modules/compiler'
 import { HardwareModule } from './modules/hardware'
 import MainProcessBridge from './modules/ipc/main'
@@ -304,6 +306,20 @@ const createMainWindow = async () => {
     hardwareModule,
   } as unknown as MainIpcModuleConstructor)
   mainIpcModule.setupMainIpcListener()
+
+  // The MCP server exists only in the process that holds the single-instance lock.
+  // A second editor process still quits above, before this window is created.
+  void startAgentMcp({
+    version: packageJson.version,
+    userDataPath: app.getPath('userData'),
+    projectService,
+    compilerModule,
+    hardwareModule,
+    bridge: mainIpcModule,
+    getWindow: () => mainWindow,
+  }).catch((error) => {
+    console.error('Failed to start the agent MCP server', error)
+  })
 
   // Remove this if your app does not use auto updates;
   new AppUpdater()

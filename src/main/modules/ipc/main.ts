@@ -833,6 +833,19 @@ class MainProcessBridge implements MainIpcModule {
     }
   }
 
+  readConnectedDebuggerMd5 = async (
+    expectedMd5: string,
+  ): Promise<{ success: boolean; match?: boolean; targetMd5?: string; error?: string }> => {
+    if (!this.debuggerModbusClient) return { success: false, error: 'Not connected' }
+    try {
+      const targetMd5 = await this.debuggerModbusClient.getMd5Hash()
+      const match = targetMd5.toLowerCase() === expectedMd5.toLowerCase()
+      return { success: true, match, targetMd5 }
+    } catch (error) {
+      return { success: false, error: error instanceof Error ? error.message : String(error) }
+    }
+  }
+
   handleDebuggerDisconnect = (_event: IpcMainInvokeEvent): Promise<{ success: boolean }> => {
     if (this.debuggerModbusClient) {
       this.debuggerModbusClient.disconnect()

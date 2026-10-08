@@ -13,6 +13,7 @@
     "build:main": "cross-env NODE_ENV=production TS_NODE_TRANSPILE_ONLY=true webpack --config ./configs/webpack/webpack.config.main.prod.ts",
     "build:renderer": "cross-env NODE_ENV=production TS_NODE_TRANSPILE_ONLY=true webpack --config ./configs/webpack/webpack.config.renderer.prod.ts",
     "lint": "cross-env NODE_ENV=development eslint ./src/**/*.{ts,tsx}",
+    "typecheck": "tsc --noEmit --pretty false --skipLibCheck",
     "lint:fix": "cross-env NODE_ENV=development eslint ./src/**/*.{ts,tsx} --debug --fix",
     "format": "cross-env NODE_ENV=development prettier --write \"./src/**/*.{ts,tsx}\"",
     "postinstall": "ts-node scripts/check-native-dep.js && electron-builder install-app-deps && npm run build:dll",

@@ -1,3 +1,4 @@
+export { AgentApprovalModal } from './agent-approval-modal'
 export * from './confirm-device-switch-modal'
 export { DebuggerIpInputModal } from './debugger-ip-input-modal'
 export { DebuggerMessageModal } from './debugger-message-modal'

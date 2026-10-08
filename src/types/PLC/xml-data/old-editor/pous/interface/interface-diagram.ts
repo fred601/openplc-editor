@@ -51,6 +51,11 @@ const interfaceXMLSchema = z.object({
       variable: z.array(variableXMLSchema).optional(),
     })
     .optional(),
+  globalVars: z
+    .object({
+      variable: z.array(variableXMLSchema).optional(),
+    })
+    .optional(),
 })
 type InterfaceXML = z.infer<typeof interfaceXMLSchema>
 
